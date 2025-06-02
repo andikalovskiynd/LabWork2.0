@@ -1,11 +1,15 @@
 GTEST_INC_DIR ?= /usr/local/include
 GTEST_LIB_DIR ?= /usr/local/lib
 GMOCK_INCLUDE_DIR ?= /usr/local/include
-GMOCK_INCLUDE_DIR ?= /usr/local/lib
+GMOCK_LIB_DIR ?= /usr/local/lib 
 
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -Iinclude -I$(GTEST_INC_DIR) 
-LDFLAGS = -L$(GTEST_LIB_DIR) -lgtest_main -lgtest -pthread 
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -Iinclude -I$(GTEST_INC_DIR) -I$(GMOCK_INCLUDE_DIR) 
+
+GTEST_LIBS = -L$(GTEST_LIB_DIR) -lgtest_main -lgtest
+GMOCK_LIBS = -L$(GMOCK_LIB_DIR) -lgmock_main -lgmock
+
+LDFLAGS = -L$(GTEST_LIB_DIR) -lgtest_main -lgtest -pthread
 
 
 SRC_DIR = src
@@ -27,27 +31,26 @@ TEST_OBJ_FILES = $(patsubst $(TEST_SRC_DIR)/%.cpp, $(TEST_OBJ_DIR)/%.o, $(TEST_S
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ_FILES) 
+$(TARGET): $(OBJ_FILES)
 	$(CXX) $(LDFLAGS) $^ -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(dir $@) 
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c -o $@ $<
 
 GAME_OBJS_FOR_TEST_RUNNER = $(filter-out $(OBJ_DIR)/main.o, $(OBJ_FILES))
 
 $(TEST_TARGET): $(GAME_OBJS_FOR_TEST_RUNNER) $(TEST_OBJ_FILES)
-	$(CXX) $(LDFLAGS) -o $@ $(GAME_OBJS_FOR_TEST_RUNNER) $(TEST_OBJ_FILES) $(GTEST_LIB) $(GMOCK_LIB) -fsanitize=address
+	$(CXX) $(GAME_OBJS_FOR_TEST_RUNNER) $(TEST_OBJ_FILES) $(GTEST_LIBS) $(GMOCK_LIBS) -pthread -o $@ 
 
 $(TEST_OBJ_DIR)/%.o: $(TEST_SRC_DIR)/%.cpp
-	@mkdir -p $(dir $@) 
-	$(CXX) $(TEST_CXXFLAGS) -I$(INCLUDE_DIR) -c -o $@ $<
-
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c -o $@ $< #
 
 test: $(TEST_TARGET)
 	./$(TEST_TARGET)
 
 clean:
-	rm -f $(TARGET) $(TEST_OBJECTS) 
+	rm -rf $(OBJ_DIR) $(TEST_OBJ_DIR) $(TARGET) $(TEST_TARGET) 
 
-.PHONY: all clean test $(TEST_TARGET) 
+.PHONY: all clean test $(TEST_TARGET)
