@@ -1,13 +1,23 @@
 # Architectural Design of LabWork2.0
 
 ## Table of contents
-1.  [System Overview](#1-system-overview)
-2.  [System Requirements and Use Cases](#2-system-requirements-and-use-cases)
-    * [2.1. Functional Requirements (FR)](#21-functional-requirements)
-    * [2.2. Non-Functional Requirements (NFR)](#22-non-functional-requirements)
-    * [2.3. Use Cases (UC)](#23-use-cases)
-3.  [Component Diagram with Description](#3-component-diagram-with-description)
-4.  [Class Diagram with Description](#4-class-diagram-with-description)
+1. [System Overview](#1-system-overview)
+2. [System Requirements and Use Cases](#2-system-requirements-and-use-cases)
+    * [2.1. Functional Requirements (FR)](#2.1-functional-requirements-(FR))
+    * [2.2. Non-Functional Requirements (NFR)](#2.2-non-functional-requirements-(NFR))
+    * [2.3. Use Cases (UC)](#2.3-use-cases-(UC))
+3. [Component Diagram with Description](#3-component-diagram-with-description)
+4. [Class Diagram with Description](#4-class-diagram-with-description)
+5. [Test Scenarios](#5-test-scenarios)
+    * [5.1. Card Test](#5.1-card-test)
+    * [5.2. Character Test](#5.2-character-test)
+    * [5.3. Easy and Medium Bot Test](#5.3-easy-and-medium-bot-test)
+    * [5.4. GameManager Test](#5.4-gamemanager-test)
+    * [5.5. Hard Bot Choose State Test](#5.5-hard-bot-choose-state-test)
+    * [5.6. Spirits Test](#5.6-spirits-test)
+    * [5.7. Turn Test](#5.7-turn-test)
+    * [5.8. Completion Criteria](#5.8-completion-criteria)
+
 
 ## 1. System Overview
 
@@ -429,3 +439,109 @@ This package provides helper classes for console I/O and general utility functio
 * `TurnManager` aggregates `Character` objects.
 * `Character`, `Player`, `Bot`, `Deck`, `GameManager`, `GameState` implementations, and `Spirit` implementations all have dependencies on `Console` for output.
 * `Player`, `Bot`, `EndGameState`, `MainMenuState`, `SetupState` have dependencies on `InputManager` for input.
+
+
+### 5. Test Scenarios
+
+The following test scenarios are based on the provided test files. For each test, an ID, name, tested module/class/function, input data, and expected result are specified.
+
+#### 5.1. Card Test
+| ID | Test Name                      | Tested Module/Function                    | Input Data                 | Expected Result                                         | Actual Result | Status |
+|----|--------------------------------|-------------------------------------------|----------------------------|---------------------------------------------------------|---------------|--------|
+| C.1| `BasicCardTest.ConstructorAndGetters`| `Card` Constructor, Getters               | "Basic card", 10, 5, 3, ATTACK | Correct initialization of all `Card` fields.            |               |        |
+| C.2| `BasicCardTest.EqualityOperator`| `Card::operator==`                       | Two identical and two different cards | `==` operator returns `true` for identical, `false` for different. |               |        |
+| C.3| `DeckTest.EmptyTest`           | `Deck::isEmpty()`                         | Empty deck                 | `isEmpty()` returns `true`.                             |               |        |
+| C.4| `DeckTest.AddCardsTest`        | `Deck::addCard()`, `Deck::isEmpty()`, `Deck::getCards().size()` | Adding one card            | Deck is not empty, size is 1.                           |               |        |
+| C.5| `DeckTest.DrawCardFromNotEmptyDeck`| `Deck::drawCard()`, `Deck::isEmpty()`   | Deck with 2 cards          | `drawCard()` returns a card, deck is not empty, size is 1. |               |        |
+| C.6| `DeckTest.DrawCardFromEmptyDeck`| `Deck::drawCard()`                       | Empty deck                 | `drawCard()` returns `nullptr`.                         |               |        |
+| C.7| `DeckTest.GetAllCardsTest`     | `Deck::getCards()`                       | Deck with multiple cards   | `getCards()` returns all cards in the correct order.    |               |        |
+| C.8| `DeckTest.ShuffleKeepsAllCards`| `Deck::shuffle()`                        | Deck with multiple cards   | Number of cards does not change after shuffling.        |               |        |
+| C.9| `AttackCardTest.ConstructorGettersEffects`| `AttackCard` Constructor, Getters       | "Strike", 10, 5, 0         | Correct initialization of `AttackCard` fields.          |               |        |
+| C.10| `HealCardTest.ConstructorGettersEffects`| `HealCard` Constructor, Getters         | "Minor healing", 6, 2, 0   | Correct initialization of `HealCard` fields.            |               |        |
+| C.11| `MagicCardTest.ConstructorGettersEffects`| `MagicCard` Constructor, Getters        | "Mana burst", 7            | Correct initialization of `MagicCard` fields.           |               |        |
+| C.12| `RespectCardTest.ConstructorGettersEffects`| `RespectCard` Constructor, Getters      | "Bow", 4, 1                | Correct initialization of `RespectCard` fields.         |               |        |
+#### 5.2. Character Test
+| ID | Test Name                      | Tested Module/Function                    | Input Data                 | Expected Result                                         | Actual Result | Status |
+|----|--------------------------------|-------------------------------------------|----------------------------|---------------------------------------------------------|---------------|--------|
+| CH.1| `CharacterTestConstructor.Constructor_Initializes_Correctly`| `Character` Constructor, Getters   | "Test char", 10, 15        | Correct initialization of name, health, respect.        |               |        |
+| CH.2| `CharacterTestGetters.BasicGetters_Return_Correct_Values`| `Character` Getters                | "Test char", 10, 15        | Getters return correct values.                          |               |        |
+| CH.3| `CharacterTestHealth.TakeDamage_ReducesHealth_Correctly`| `Character::takeDamage()`          | Health 10, damage 5        | Health reduces to 5.                                    |               |        |
+| CH.4| `CharacterTestHealth.TakeDamage_HealthNotBelowZero`| `Character::takeDamage()`          | Health 10, damage 20       | Health becomes 0, not negative.                         |               |        |
+| CH.5| `CharacterTestHealth.Heal_IncreasesHealth_Correctly`| `Character::heal()`                | Health 10, heal 5          | Health increases to 15.                                 |               |        |
+| CH.6| `CharacterTestHealth.Heal_HealthNotAboveMax`| `Character::heal()`                | Health 10, max 20, heal 15 | Health becomes 20, not above max.                       |               |        |
+| CH.7| `CharacterTestRespect.GainRespect_IncreasesRespect_Correctly`| `Character::gainRespect()`         | Respect 10, gain 5         | Respect increases to 15.                                |               |        |
+| CH.8| `CharacterTestRespect.LoseRespect_ReducesRespect_Correctly`| `Character::loseRespect()`         | Respect 10, loss 5         | Respect reduces to 5.                                   |               |        |
+| CH.9| `CharacterTestRespect.LoseRespect_RespectNotBelowZero`| `Character::loseRespect()`         | Respect 10, loss 20        | Respect becomes 0, not negative.                        |               |        |
+| CH.10| `CharacterTestHand.DrawCard_AddsCardToHand`| `Character::drawCard()`, `Deck::drawCard()`| Deck with card, empty hand | Card is added to hand.                                  |               |        |
+| CH.11| `CharacterTestHand.DiscardCard_RemovesCardFromHand`| `Character::discardCard()`         | Hand with card, discard this card| Card is removed from hand.                              |               |        |
+| CH.12| `CharacterTestApplyCardEffect.AttackCardEffect_ReducesOpponentHealth`| `Character::ApplyCardEffect()` with AttackCard, `MockGameManager` | Player, opponent, AttackCard, `shouldAmplify`=false | Opponent health reduces, magic pool updates, amplify no change. |               |        |
+| CH.13| `CharacterTestApplyCardEffect.HealCardEffect_IncreasesPlayerHealth`| `Character::ApplyCardEffect()` with HealCard, `MockGameManager`   | Player, HealCard, `shouldAmplify`=false | Player health increases, magic pool updates.            |               |        |
+| CH.14| `CharacterTestApplyCardEffect.MagicCardEffect_UpdatesMagicPool`| `Character::ApplyCardEffect()` with MagicCard, `MockGameManager` | Player, MagicCard, `shouldAmplify`=false | Magic pool updates.                                     |               |        |
+| CH.15| `CharacterTestApplyCardEffect.RespectCardEffect_UpdatesPlayerRespect`| `Character::ApplyCardEffect()` with RespectCard, `MockGameManager`| Player, RespectCard, `shouldAmplify`=false | Player respect increases, magic pool updates.           |               |        |
+| CH.16| `CharacterTestApplyCardEffect.AmplifyEffect_DoublesCardEffect`| `Character::ApplyCardEffect()` with any Card, `MockGameManager`| Player, card, `shouldAmplify`=true | Card effect is doubled, magic pool resets.              |               |        |
+
+#### 5.3. Easy and Medium Bot Test
+| ID | Test Name                      | Tested Module/Function                    | Input Data                 | Expected Result                                         | Actual Result | Status |
+|----|--------------------------------|-------------------------------------------|----------------------------|---------------------------------------------------------|---------------|--------|
+| BEM.1| `EasyBot_ChooseCard_Test.ChooseCard_AlwaysRandom`| `Bot::chooseCard()` (Easy difficulty) | Bot, `MockGameManager`, hand of multiple cards | Bot always chooses a random card (checked by lack of strict logic). |               |        |
+| BEM.2| `MediumBot_ChooseState_Test.ChooseState_BotLowHealth_Defensive`| `Bot::chooseState()` (Medium difficulty) | Bot with low health (<=10), opponent | Bot chooses `CriticallyDefensive` state.                |               |        |
+| BEM.3| `MediumBot_ChooseCard_Test.ChooseCard_BotLowHealth_HealCard`| `Bot::chooseCard()` (Medium difficulty) | Bot with low health, hand with heal card | Bot chooses a heal card.                                |               |        |
+| BEM.4| `MediumBot_ChooseState_Test.ChooseState_OpponentLowRespect_RespectFocus`| `Bot::chooseState()` (Medium difficulty) | Opponent with low respect (<=10), bot | Bot chooses `RespectFocus` state.                       |               |        |
+| BEM.5| `MediumBot_ChooseCard_Test.ChooseCard_OpponentLowRespect_RespectCard`| `Bot::chooseCard()` (Medium difficulty) | Opponent with low respect, hand with respect card | Bot chooses a respect card.                             |               |        |
+| BEM.6| `MediumBot_ChooseState_Test.ChooseState_NormalConditions_Balance`| `Bot::chooseState()` (Medium difficulty) | Healthy bot, healthy opponent | Bot chooses `Balance` state.                            |               |        |
+| BEM.7| `MediumBot_ChooseCard_Test.ChooseCard_NormalConditions_Random`| `Bot::chooseCard()` (Medium difficulty) | Healthy bot, hand with multiple cards | Bot chooses a random card (in Balance state).           |               |        |
+
+#### 5.4. GameManager Test
+| ID | Test Name                      | Tested Module/Function                    | Input Data                 | Expected Result                                         | Actual Result | Status |
+|----|--------------------------------|-------------------------------------------|----------------------------|---------------------------------------------------------|---------------|--------|
+| GM.1| `GameManagerTest.ConstructorTest`| `GameManager` Constructor               | Empty deck                 | Magic pool 0, player list is empty.                     |               |        |
+| GM.2| `GameManagerTest.GetDeckTest`  | `GameManager::getDeck()`                  | Deck `originalDeck`        | `getDeck()` returns reference to `originalDeck`.        |               |        |
+| GM.3| `GameManagerTest.AddPlayerTest`| `GameManager::addPlayer()`                | Add 1, then 2 players      | Player list size increases to 1, then to 2.             |               |        |
+| GM.4| `GameManagerTest.GetPlayersTest`| `GameManager::getPlayers()`              | Players added              | `getPlayers()` returns correct player list.             |               |        |
+| GM.5| `GameManagerTest.SetAndGetCurrentPlayerTest`| `GameManager::setCurrentPlayer()`, `getCurrentPlayer()` | Setting current player     | `getCurrentPlayer()` returns correctly set player.      |               |        |
+| GM.6| `GameManagerTest.UpdateMagicPoolTest`| `GameManager::updateMagicPool()`       | Various magic pool change values | Magic pool updates correctly.                           |               |        |
+| GM.7| `GameManagerTest.ResetMagicPoolTest`| `GameManager::resetMagicPool()`        | Magic pool not 0           | Magic pool resets to 0.                                 |               |        |
+| GM.8| `GameManagerTest.AddSpiritTest`| `GameManager::addSpirit()`                | Adding a spirit            | Spirit list is not empty, size is 1.                    |               |        |
+| GM.9| `GameManagerTest.ApplySpiritEffectsTest`| `GameManager::applySpiritEffects()`    | Players, spirits (Evil, Good, Magic) | Spirit effects are applied to players and/or magic pool. |               |        |
+| GM.10| `GameManagerTest.ShouldAmplifyTest_MagicPoolInRange`| `GameManager::shouldAmplify()`       | Magic pool from -10 to 10  | Returns `false`.                                        |               |        |
+| GM.11| `GameManagerTest.ShouldAmplifyTest_MagicPoolPositiveAndPlayer`| `GameManager::shouldAmplify()`       | Magic pool >= 10, current player is `Player` | Returns `true`.                                         |               |        |
+| GM.12| `GameManagerTest.ShouldAmplifyTest_MagicPoolNegativeAndBot`| `GameManager::shouldAmplify()`       | Magic pool <= -10, current player is `Bot` | Returns `true`.                                         |               |        |
+| GM.13| `GameManagerTest.ShouldAmplifyTest_MagicPoolPositiveAndBot`| `GameManager::shouldAmplify()`       | Magic pool >= 10, current player is `Bot` | Returns `false`.                                        |               |        |
+| GM.14| `GameManagerTest.ShouldAmplifyTest_MagicPoolNegativeAndPlayer`| `GameManager::shouldAmplify()`       | Magic pool <= -10, current player is `Player` | Returns `false`.                                        |               |        |
+
+#### 5.5. Hard Bot Choose State Test
+| ID | Test Name                      | Tested Module/Function                    | Input Data                 | Expected Result                                         | Actual Result | Status |
+|----|--------------------------------|-------------------------------------------|----------------------------|---------------------------------------------------------|---------------|--------|
+| HB.1| `HardBot_ChooseState_Test.ChooseState_VeryLowHealthBot_CriticallyDefensive`| `Bot::chooseState()` (Hard difficulty) | Bot with very low health (<=10), opponent | Bot chooses `CriticallyDefensive`.                      |               |        |
+| HB.2| `HardBot_ChooseState_Test.ChooseState_MagicPoolHigh_MagicAdvantage`| `Bot::chooseState()` (Hard difficulty) | Bot, high magic pool (>=10) | Bot chooses `MagicAdvantageBot`.                        |               |        |
+| HB.3| `HardBot_ChooseState_Test.ChooseState_OpponentVeryLowHealth_Aggressive`| `Bot::chooseState()` (Hard difficulty) | Opponent with very low health (<=5), bot | Bot chooses `Aggressive`.                               |               |        |
+| HB.4| `HardBot_ChooseState_Test.ChooseState_OpponentKindaLowRespect_RespectFocus`| `Bot::chooseState()` (Hard difficulty) | Opponent with low respect (<=10), bot | Bot chooses `RespectFocus`.                             |               |        |
+| HB.5| `HardBot_ChooseState_Test.ChooseState_BotKindaLowRespect_RespectFocus`| `Bot::chooseState()` (Hard difficulty) | Bot with low respect (<=10), opponent | Bot chooses `RespectFocus`.                             |               |        |
+| HB.6| `HardBot_ChooseState_Test.ChooseState_MagicPoolLow_MagicAdvantage`| `Bot::chooseState()` (Hard difficulty) | Bot, low magic pool (<= -10) | Bot chooses `MagicAdvantageBot`.                        |               |        |
+| HB.7| `HardBot_ChooseState_Test.ChooseState_AllConditionsNormal_Balance`| `Bot::chooseState()` (Hard difficulty) | Normal bot, opponent, magic pool state | Bot chooses `Balance`.                                  |               |        |
+| HB.8| `HardBot_ChooseCard_Test.ChooseCard_CriticallyDefensive_HealCard`| `Bot::chooseCard()` (Hard difficulty) | Bot in `CriticallyDefensive` state, hand with heal card | Bot chooses heal card with max effect.                  |               |        |
+| HB.9| `HardBot_ChooseCard_Test.ChooseCard_Aggressive_AttackCard`| `Bot::chooseCard()` (Hard difficulty) | Bot in `Aggressive` state, hand with attack card | Bot chooses attack card with max effect.                |               |        |
+| HB.10| `HardBot_ChooseCard_Test.ChooseCard_MagicAdvantage_MagicCard`| `Bot::chooseCard()` (Hard difficulty) | Bot in `MagicAdvantageBot` state, hand with magic card | Bot chooses magic card with max effect.                 |               |        |
+| HB.11| `HardBot_ChooseCard_Test.ChooseCard_RespectFocus_RespectCard`| `Bot::chooseCard()` (Hard difficulty) | Bot in `RespectFocus` state, hand with respect card | Bot chooses respect card with max effect.               |               |        |
+| HB.12| `HardBot_ChooseCard_Test.ChooseCard_Balance_AppropriateCard`| `Bot::chooseCard()` (Hard difficulty) | Bot in `Balance` state, hand with various cards | Bot chooses a balanced card.                            |               |        |
+
+#### 5.6. Spirits Test
+| ID | Test Name                      | Tested Module/Function                    | Input Data                 | Expected Result                                         | Actual Result | Status |
+|----|--------------------------------|-------------------------------------------|----------------------------|---------------------------------------------------------|---------------|--------|
+| S.1 | `EvilSpiritTest.ApplyEffectTest`| `EvilSpirit::applyEffect()`              | Target with 15 HP, EvilSpirit (damage 10)| Target health reduces by 10.                            |               |        |
+| S.2 | `GoodSpiritTest.ApplyEffectTest`| `GoodSpirit::applyEffect()`              | Target with 15 HP, GoodSpirit (heal 10)| Target health increases by 10.                          |               |        |
+| S.3 | `MagicWizardTest.ApplyEffectTest`| `MagicWizard::applyEffect()`             | Creator Player, `GameManager`, MagicWizard (effect -5) | Magic pool decreases by 5.                              |               |        |
+| S.4 | `MagicWizardTest.ApplyEffectTest_BotCreator`| `MagicWizard::applyEffect()`             | Creator Bot, `GameManager`, MagicWizard (effect 5) | Magic pool increases by 5.                              |               |        |
+
+#### 5.7. Turn Test
+| ID | Test Name                      | Tested Module/Function                    | Input Data                 | Expected Result                                         | Actual Result | Status |
+|----|--------------------------------|-------------------------------------------|----------------------------|---------------------------------------------------------|---------------|--------|
+| T.1 | `TurnManagerTest.ConstructorTest`| `TurnManager` Constructor               | List of players            | `TurnManager` initialized, first player correct.        |               |        |
+| T.2 | `TurnManagerTest.NextTurnTest_MultiplePlayers`| `TurnManager::nextTurn()`, `getCurrentPlayer()` | List of 3+ players         | Turn switches in round-robin fashion, skipping dead players. |               |        |
+| T.3 | `TurnManagerTest.IsGameOverReturnsFalse`| `TurnManager::isGameOver()`            | All alive, or 1 dead out of 3+ | `isGameOver()` returns `false`.                         |               |        |
+| T.4 | `TurnManagerTest.IsGameOverSinglePlayerReturnsTrue`| `TurnManager::isGameOver()`            | Only 1 player alive        | `isGameOver()` returns `true`.                          |               |        |
+| T.5 | `TurnManagerTest.IsGameOverAllDead`| `TurnManager::isGameOver()`            | All players dead           | `isGameOver()` returns `true`.                          |               |        |
+
+### 5.8. Completion Criteria
+* All described test scenarios are executed.
+* All unit tests pass successfully.
