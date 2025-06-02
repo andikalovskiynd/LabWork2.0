@@ -76,6 +76,10 @@ void Character::ApplyCardEffect (const Card& card, GameManager& game)
     }
 
     int respectRatio = std::abs(this->getRespect() - opponent->getRespect());
+    if (respectRatio == 0)
+    {
+        respectRatio = 1;
+    }
     
     switch(card.getType())
     {
